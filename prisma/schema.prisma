@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(uuid())
+  name          String
+  email         String        @unique
+  password      String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  organizedEvents SecretSanta[] @relation("Organizer")
+  participations Participant[]
+  sentFriendRequests     Friendship[] @relation("Sender")
+  receivedFriendRequests Friendship[] @relation("Receiver")
+  sentNotifications      Notification[] @relation("NotificationSender")
+  receivedNotifications  Notification[] @relation("NotificationReceiver")
+}
+
+model SecretSanta {
+  id          String        @id @default(uuid())
+  name        String
+  date        DateTime
+  budget      Decimal       @db.Decimal(10, 2)
+  organizerId String
+  organizer   User          @relation("Organizer", fields: [organizerId], references: [id])
+  participants Participant[]
+  notifications Notification[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Participant {
+  id            String      @id @default(uuid())
+  secretSantaId String
+  userId        String
+  targetUserId  String?
+  wishList      String?
+  secretSanta   SecretSanta @relation(fields: [secretSantaId], references: [id])
+  user          User        @relation(fields: [userId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Friendship {
+  id           String   @id @default(uuid())
+  senderId     String
+  receiverId   String
+  status       FriendshipStatus @default(PENDING)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  sender       User     @relation("Sender", fields: [senderId], references: [id])
+  receiver     User     @relation("Receiver", fields: [receiverId], references: [id])
+  notifications Notification[]
+
+  @@unique([senderId, receiverId])
+}
+
+model Notification {
+  id           String   @id @default(uuid())
+  type         String
+  content      String
+  read         Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  sender       User     @relation("NotificationSender", fields: [senderId], references: [id])
+  senderId     String
+  receiver     User     @relation("NotificationReceiver", fields: [receiverId], references: [id])
+  receiverId   String
+  friendship   Friendship? @relation(fields: [friendshipId], references: [id])
+  friendshipId String?
+  secretSanta  SecretSanta? @relation(fields: [secretSantaId], references: [id])
+  secretSantaId String?
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum NotificationType {
+  FRIEND_REQUEST
+  EVENT_INVITE
+  EVENT_UPDATE
+  DRAW_RESULT
+}

@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Amigo Oculto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Mesmo estilo do index.html */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .event-list {
+            margin-top: 20px;
+        }
+        .event-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .user-info {
+            text-align: right;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .user-email {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .user-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+        /* Adicione estes estilos */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 24px;
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 10px;
+            z-index: 1;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .dashboard-content {
+            display: flex;
+            gap: 20px;
+        }
+
+        .sidebar {
+            width: 300px;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex-grow: 1;
+        }
+
+        .notifications-panel, .friends-panel {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .notifications-list, .friends-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            background-color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .notification-content {
+            flex: 1;
+            cursor: pointer;
+            padding-right: 10px;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .accept-btn, .reject-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+
+        .accept-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .reject-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .accept-btn:hover {
+            background-color: #218838;
+        }
+
+        .reject-btn:hover {
+            background-color: #c82333;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f8ff;
+        }
+
+        .friend-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+
+        .add-friend-btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .notification-item {
+            position: relative;
+        }
+
+        .notification-item .notification-content {
+            display: inline-block;
+        }
+
+        .notification-item .notification-actions {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .friends-list-complete {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .friend-card {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+        }
+
+        .friend-card .friend-info {
+            margin-bottom: 10px;
+        }
+
+        .friend-card .friend-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .friend-card .friend-email {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .info-text {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .secondary-btn {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .secondary-btn:hover {
+            background-color: #5a6268;
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            border: none;
+            color: #dc3545;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: color 0.3s;
+        }
+
+        .delete-btn:hover {
+            color: #c82333;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .friend-requests-panel {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .friend-request-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .request-info {
+            flex: 1;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .friend-requests-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Estilo para o modal de criação de evento especificamente */
+        #createEventModal .modal-content {
+            margin: 2% auto;
+            position: relative;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .friends-selection {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            background-color: #f8f9fa;
+        }
+
+        .friend-select-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .friend-select-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .friend-select-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .friend-select-item .friend-info {
+            flex: 1;
+            padding: 5px;
+        }
+
+        .friend-select-item label {
+            display: block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .friend-select-item strong {
+            display: block;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .friend-select-item .friend-email {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .events-list {
+            margin-top: 20px;
+        }
+        
+        .event-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .event-item h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .event-item p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .action-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-buttons button {
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+
+        .event-invite {
+            background-color: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .event-invite .request-info strong {
+            color: #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Meus Amigos Ocultos</h1>
+            <div class="user-info">
+                <div class="user-name" id="userName">Carregando...</div>
+                <div class="user-email" id="userEmail"></div>
+                <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
+        </div>
+        <div class="dashboard-content">
+            <div class="sidebar">
+                <div class="friend-requests-panel">
+                    <h3>Solicitações de Amizade</h3>
+                    <div id="friend-requests-list" class="friend-requests-list">
+                        <!-- Lista será carregada dinamicamente -->
+                    </div>
+                </div>
+                <div class="friends-panel">
+                    <h3>Amigos</h3>
+                    <button onclick="showAddFriendModal()" class="add-friend-btn">Adicionar Amigo</button>
+                    <div id="friends-list" class="friends-list">
+                        <!-- Lista de amigos será carregada aqui -->
+                    </div>
+                </div>
+            </div>
+            <div class="main-content">
+                <div class="action-buttons">
+                    <button onclick="openCreateEventModal()">Criar Novo Amigo Oculto</button>
+                    <button onclick="openFriendsListModal()">Ver Lista de Amigos</button>
+                </div>
+                <h2>Meus Amigos Ocultos</h2>
+                <div id="events-list" class="events-list">
+                    <!-- Lista de eventos será carregada aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para criar novo amigo oculto -->
+    <div id="createEventModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Criar Novo Amigo Oculto</h2>
+            <form id="createEventForm" onsubmit="handleCreateEvent(event)">
+                <div class="form-group">
+                    <label for="eventName">Nome do Evento:</label>
+                    <input type="text" id="eventName" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDate">Data:</label>
+                    <input type="date" id="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventBudget">Valor Máximo:</label>
+                    <input type="number" id="eventBudget" required min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Selecione pelo menos 2 amigos para convidar:</label>
+                    <div id="friendsSelection" class="friends-selection">
+                        <!-- Lista de amigos será carregada aqui -->
+                    </div>
+                </div>
+                <button type="submit">Criar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Adicione este modal após o modal existente -->
+    <div id="addFriendModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddFriendModal()">&times;</span>
+            <h2>Adicionar Amigo</h2>
+            <form id="addFriendForm" onsubmit="handleAddFriend(event)">
+                <div class="form-group">
+                    <label for="friendEmail">Email do Amigo:</label>
+                    <input type="email" id="friendEmail" required>
+                </div>
+                <button type="submit">Enviar Solicitação</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Adicione este novo modal para lista de amigos -->
+    <div id="friendsListModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFriendsListModal()">&times;</span>
+            <h2>Meus Amigos</h2>
+            <button onclick="showAddFriendModal()" class="add-friend-btn">Adicionar Novo Amigo</button>
+            <div id="friendsListComplete" class="friends-list-complete">
+                <!-- Lista completa de amigos será carregada aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+
+        // Carrega os dados do usuário ao iniciar
+        function loadUserData() {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (userData) {
+                document.getElementById('userName').textContent = `Olá, ${userData.name}!`;
+                document.getElementById('userEmail').textContent = userData.email;
+            } else {
+                window.location.href = '/'; // Redireciona para login se não houver dados
+            }
+        }
+
+        async function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+            }
+        }
+
+        async function loadEvents() {
+            try {
+                const response = await fetch(`${API_URL}/secret-santa`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar eventos');
+
+                const events = await response.json();
+                const eventsList = document.getElementById('events-list');
+
+                if (!events || events.length === 0) {
+                    eventsList.innerHTML = '<p>Nenhum amigo oculto criado ainda.</p>';
+                    return;
+                }
+
+                eventsList.innerHTML = events.map(event => `
+                    <div class="event-item">
+                        <h3>${event.name}</h3>
+                        <p>Data: ${new Date(event.date).toLocaleDateString()}</p>
+                        <p>Valor Máximo: R$ ${Number(event.budget).toFixed(2)}</p>
+                        <p>Organizador: ${event.organizer.name}</p>
+                        <p>Participantes: ${event.participants ? event.participants.length : 0}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar eventos:', error);
+                document.getElementById('events-list').innerHTML = 
+                    '<p>Erro ao carregar eventos. Tente novamente mais tarde.</p>';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/';
+        }
+
+        // Inicialização
+        checkAuth();
+        loadUserData();
+        loadEvents();
+
+        // Funções para o modal
+        function openCreateEventModal() {
+            const createEventModal = document.getElementById('createEventModal');
+            createEventModal.style.display = 'block';
+            loadFriendsForSelection();
+        }
+
+        function closeModal() {
+            document.getElementById('createEventModal').style.display = 'none';
+        }
+
+        // Função para criar novo evento
+        async function handleCreateEvent(event) {
+            event.preventDefault();
+            
+            try {
+                const selectedFriends = Array.from(document.querySelectorAll('input[name="selectedFriends"]:checked'))
+                    .map(input => input.value);
+
+                console.log('Amigos selecionados:', selectedFriends);
+
+                if (selectedFriends.length < 2) {
+                    alert('Selecione pelo menos 2 amigos para criar o amigo oculto');
+                    return;
+                }
+
+                const name = document.getElementById('eventName').value;
+                const date = document.getElementById('eventDate').value;
+                const budget = parseFloat(document.getElementById('eventBudget').value);
+
+                const eventData = {
+                    name,
+                    date,
+                    budget,
+                    invitedFriends: selectedFriends
+                };
+
+                console.log('Dados sendo enviados:', eventData);
+
+                const response = await fetch(`${API_URL}/secret-santa`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(eventData)
+                });
+
+                const data = await response.json();
+                console.log('Resposta do servidor:', data);
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro ao criar evento');
+                }
+
+                closeModal();
+                loadEvents();
+                document.getElementById('createEventForm').reset();
+                alert('Evento criado com sucesso! Os convites foram enviados para os amigos selecionados.');
+            } catch (error) {
+                console.error('Erro ao criar evento:', error);
+                alert(error.message);
+            }
+        }
+
+        // Adicione também a função para carregar os eventos
+        async function loadEvents() {
+            try {
+                const response = await fetch(`${API_URL}/secret-santa`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar eventos');
+
+                const events = await response.json();
+                const eventsList = document.getElementById('events-list');
+
+                if (events.length === 0) {
+                    eventsList.innerHTML = '<p>Nenhum amigo oculto criado ainda.</p>';
+                    return;
+                }
+
+                eventsList.innerHTML = events.map(event => `
+                    <div class="event-item">
+                        <h3>${event.name}</h3>
+                        <p>Data: ${new Date(event.date).toLocaleDateString()}</p>
+                        <p>Valor Máximo: R$ ${event.budget}</p>
+                        <p>Participantes: ${event.participants.length}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar eventos');
+            }
+        }
+
+        // Adicione esta função para facilitar adicionar amigos
+        function showAddFriendFromEvent() {
+            closeModal(); // Fecha o modal de criar evento
+            openFriendsListModal(); // Abre o modal de amigos
+        }
+
+        // Fecha o modal se clicar fora dele
+        window.onclick = function(event) {
+            const createEventModal = document.getElementById('createEventModal');
+            const addFriendModal = document.getElementById('addFriendModal');
+            const friendsListModal = document.getElementById('friendsListModal');
+            
+            if (event.target === createEventModal) {
+                closeModal();
+            } else if (event.target === addFriendModal) {
+                closeAddFriendModal();
+            } else if (event.target === friendsListModal) {
+                closeFriendsListModal();
+            }
+        }
+
+        // Funções para gerenciar notificações
+        async function loadFriendRequests() {
+            try {
+                const response = await fetch(`${API_URL}/friends/pending`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar solicitações');
+
+                const requests = await response.json();
+                console.log('Solicitações de amizade:', requests);
+
+                // Carrega os convites de amigo oculto
+                const notificationsResponse = await fetch(`${API_URL}/notifications/event-invites`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!notificationsResponse.ok) {
+                    throw new Error('Erro ao carregar convites de amigo oculto');
+                }
+
+                const eventInvites = await notificationsResponse.json();
+                console.log('Convites de amigo oculto:', eventInvites);
+
+                const requestsList = document.getElementById('friend-requests-list');
+
+                if (requests.length === 0 && eventInvites.length === 0) {
+                    requestsList.innerHTML = '<p>Nenhuma solicitação pendente.</p>';
+                    return;
+                }
+
+                requestsList.innerHTML = `
+                    ${requests.map(request => `
+                        <div class="friend-request-item">
+                            <div class="request-info">
+                                <strong>${request.sender.name}</strong>
+                                <div>${request.sender.email}</div>
+                            </div>
+                            <div class="request-actions">
+                                <button onclick="handleFriendRequest('${request.id}', true)" class="accept-btn">
+                                    <i class="fas fa-check"></i> Aceitar
+                                </button>
+                                <button onclick="handleFriendRequest('${request.id}', false)" class="reject-btn">
+                                    <i class="fas fa-times"></i> Recusar
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                    ${eventInvites.map(invite => `
+                        <div class="friend-request-item event-invite">
+                            <div class="request-info">
+                                <strong>Convite para Amigo Oculto</strong>
+                                <div>De: ${invite.sender.name}</div>
+                                <div>Evento: ${invite.secretSanta.name}</div>
+                                <div>Data: ${new Date(invite.secretSanta.date).toLocaleDateString()}</div>
+                                <div>Valor: R$ ${Number(invite.secretSanta.budget).toFixed(2)}</div>
+                            </div>
+                            <div class="request-actions">
+                                <button onclick="handleEventInvite('${invite.secretSantaId}', true)" class="accept-btn">
+                                    <i class="fas fa-check"></i> Aceitar
+                                </button>
+                                <button onclick="handleEventInvite('${invite.secretSantaId}', false)" class="reject-btn">
+                                    <i class="fas fa-times"></i> Recusar
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+            } catch (error) {
+                console.error('Erro ao carregar solicitações/convites:', error);
+                document.getElementById('friend-requests-list').innerHTML = 
+                    '<p>Erro ao carregar solicitações. Tente novamente mais tarde.</p>';
+            }
+        }
+
+        // Atualiza a inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadUserData();
+            loadFriendRequests();
+            loadFriends();
+            loadEvents();
+        });
+
+        // Atualize o intervalo
+        setInterval(loadFriendRequests, 60000);
+
+        // Funções para gerenciar amigos
+        async function loadFriends() {
+            try {
+                const response = await fetch(`${API_URL}/friends`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar amigos');
+
+                const friends = await response.json();
+                const friendsList = document.getElementById('friends-list');
+
+                friendsList.innerHTML = friends.map(friend => `
+                    <div class="friend-item">
+                        <div>
+                            <strong>${friend.name}</strong>
+                            <div>${friend.email}</div>
+                        </div>
+                        <button onclick="inviteToEvent('${friend.id}')">Convidar</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        function showAddFriendModal() {
+            document.getElementById('addFriendModal').style.display = 'block';
+        }
+
+        function closeAddFriendModal() {
+            document.getElementById('addFriendModal').style.display = 'none';
+        }
+
+        async function handleAddFriend(event) {
+            event.preventDefault();
+            const email = document.getElementById('friendEmail').value;
+
+            console.log('Enviando solicitação para:', email);
+            console.log('Token:', localStorage.getItem('token'));
+
+            try {
+                const response = await fetch(`${API_URL}/friends/request`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                console.log('Status da resposta:', response.status);
+                const data = await response.json();
+                console.log('Resposta:', data);
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro ao enviar solicitação');
+                }
+
+                closeAddFriendModal();
+                document.getElementById('addFriendForm').reset();
+                alert('Solicitação de amizade enviada!');
+                loadFriends(); // Recarrega a lista de amigos
+            } catch (error) {
+                console.error('Erro detalhado:', error);
+                alert(error.message);
+            }
+        }
+
+        // Adicione estas chamadas à inicialização
+        loadFriendRequests();
+        loadFriends();
+
+        // Atualiza as notificações a cada minuto
+        setInterval(loadFriendRequests, 60000);
+
+        // Adicione a função para lidar com as respostas às solicitações de amizade
+        async function handleFriendRequest(friendshipId, accept) {
+            try {
+                console.log('Respondendo à solicitação:', { friendshipId, accept });
+                
+                const response = await fetch(`${API_URL}/friends/request/${friendshipId}/respond`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ accept })
+                });
+
+                const data = await response.json();
+                console.log('Resposta:', data);
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro ao responder solicitação');
+                }
+
+                // Recarrega as notificações e a lista de amigos
+                await Promise.all([loadFriendRequests(), loadFriends()]);
+                alert(`Solicitação de amizade ${accept ? 'aceita' : 'recusada'} com sucesso!`);
+            } catch (error) {
+                console.error('Erro ao responder solicitação:', error);
+                alert(error.message);
+            }
+        }
+
+        // Adicione estas novas funções
+        function openFriendsListModal() {
+            document.getElementById('friendsListModal').style.display = 'block';
+            loadFriendsList();
+        }
+
+        function closeFriendsListModal() {
+            document.getElementById('friendsListModal').style.display = 'none';
+        }
+
+        async function loadFriendsList() {
+            try {
+                const response = await fetch(`${API_URL}/friends`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar amigos');
+
+                const friends = await response.json();
+                const friendsList = document.getElementById('friendsListComplete');
+
+                if (friends.length === 0) {
+                    friendsList.innerHTML = '<p>Você ainda não tem amigos adicionados.</p>';
+                    return;
+                }
+
+                friendsList.innerHTML = friends.map(friend => `
+                    <div class="friend-card">
+                        <div class="friend-info">
+                            <div class="friend-name">${friend.name}</div>
+                            <div class="friend-email">${friend.email}</div>
+                        </div>
+                        <button onclick="inviteToEvent('${friend.id}')" class="invite-btn">
+                            Convidar para Amigo Oculto
+                        </button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar lista de amigos');
+            }
+        }
+
+        // Adicione a função para deletar notificação
+        async function deleteNotification(notificationId) {
+            try {
+                const response = await fetch(`${API_URL}/notifications/${notificationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.message || 'Erro ao deletar notificação');
+                }
+
+                await loadNotifications(); // Recarrega as notificações
+            } catch (error) {
+                console.error('Erro ao deletar notificação:', error);
+                alert(error.message);
+            }
+        }
+
+        // Adicione a função para convidar amigos
+        async function inviteToEvent(friendId, eventId) {
+            try {
+                const response = await fetch(`${API_URL}/secret-santa/${eventId}/invite`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ invitedUserId: friendId })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro ao enviar convite');
+                }
+
+                alert('Convite enviado com sucesso!');
+            } catch (error) {
+                console.error('Erro:', error);
+                alert(error.message);
+            }
+        }
+
+        // Adicione esta função para carregar amigos no modal de criação
+        async function loadFriendsForSelection() {
+            try {
+                const response = await fetch(`${API_URL}/friends`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar amigos');
+
+                const friends = await response.json();
+                console.log('Amigos disponíveis:', friends);
+                const friendsSelection = document.getElementById('friendsSelection');
+
+                friendsSelection.innerHTML = friends.map(friend => `
+                    <div class="friend-select-item">
+                        <label for="friend_${friend.id}" class="friend-select-label">
+                            <input type="checkbox" name="selectedFriends" value="${friend.id}" id="friend_${friend.id}" class="friend-checkbox">
+                            <div class="friend-info">
+                                <strong>${friend.name}</strong>
+                                <div class="friend-email">${friend.email}</div>
+                            </div>
+                        </label>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar amigos:', error);
+                alert('Erro ao carregar lista de amigos');
+            }
+        }
+
+        async function handleEventInvite(eventId, accept) {
+            try {
+                const response = await fetch(`${API_URL}/secret-santa/${eventId}/join`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ accept })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao responder ao convite');
+                }
+
+                loadFriendRequests();
+                loadEvents();
+                alert(`Convite ${accept ? 'aceito' : 'recusado'} com sucesso!`);
+            } catch (error) {
+                console.error('Erro:', error);
+                alert(error.message);
+            }
+        }
+    </script>
+</body>
+</html> 
