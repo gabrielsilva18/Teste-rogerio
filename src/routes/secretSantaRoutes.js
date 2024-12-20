@@ -1,0 +1,1 @@
+router.delete('/:id', authMiddleware, secretSantaController.delete); 

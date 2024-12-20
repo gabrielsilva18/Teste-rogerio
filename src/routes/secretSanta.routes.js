@@ -14,5 +14,6 @@ router.post('/:id/join', secretSantaController.join);
 router.put('/:id/wishlist', secretSantaController.updateWishList);
 router.get('/:id/target', secretSantaController.getMyTarget);
 router.post('/:id/invite', secretSantaController.inviteParticipant);
+router.delete('/:id', secretSantaController.delete);
 
 module.exports = router; 

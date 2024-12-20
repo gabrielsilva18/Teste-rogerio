@@ -77,21 +77,23 @@
         .modal {
             display: none;
             position: fixed;
-            top: 0;
+            z-index: 1;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
         }
         .modal-content {
-            background-color: white;
+            background-color: #fefefe;
             margin: 5% auto;
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             width: 80%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
+            max-width: 600px;
+            position: relative;
+            animation: slideDown 0.3s ease-out;
         }
         .close {
             float: right;
@@ -369,56 +371,65 @@
         }
 
         .friends-selection {
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
+            margin: 15px 0;
             border: 1px solid #ddd;
-            padding: 10px;
             border-radius: 4px;
-            margin: 10px 0;
-            background-color: #f8f9fa;
+            padding: 10px;
+            background-color: #fff;
         }
 
         .friend-select-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 5px;
-            background-color: white;
-            border-radius: 4px;
-            border: 1px solid #eee;
             transition: background-color 0.2s;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        .friend-select-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
         }
 
         .friend-select-item:hover {
-            background-color: #f0f0f0;
+            background-color: #f8f9fa;
+        }
+
+        .friend-select-item label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+            padding: 5px;
         }
 
         .friend-select-item input[type="checkbox"] {
             margin-right: 10px;
-            transform: scale(1.2);
+            width: 18px;
+            height: 18px;
             cursor: pointer;
         }
 
-        .friend-select-item .friend-info {
+        .friend-info {
             flex: 1;
-            padding: 5px;
+            margin-left: 10px;
         }
 
-        .friend-select-item label {
+        .friend-info strong {
             display: block;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .friend-select-item strong {
-            display: block;
+            font-size: 1.1em;
             color: #333;
             margin-bottom: 3px;
         }
 
-        .friend-select-item .friend-email {
-            color: #666;
+        .friend-info .friend-email {
             font-size: 0.9em;
+            color: #666;
+            margin-top: 2px;
         }
 
         .form-group label {
@@ -468,6 +479,151 @@
         .event-invite .request-info strong {
             color: #17a2b8;
         }
+
+        .warning-text {
+            color: #856404;
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .event-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .details-btn {
+            background-color: #17a2b8;
+        }
+
+        .details-btn:hover {
+            background-color: #138496;
+        }
+
+        .draw-btn {
+            background-color: #28a745;
+        }
+
+        .draw-btn:hover {
+            background-color: #218838;
+        }
+
+        .invite-btn {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .invite-btn:hover {
+            background-color: #e0a800;
+        }
+
+        .event-details {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .invite-modal .modal-content {
+            max-width: 500px;
+            padding: 25px;
+        }
+
+        .invite-modal h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .no-friends-message {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .event-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .participant-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .participant-card h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .participant-info {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Estilos específicos para o modal de amigo sorteado */
+        .friend-reveal {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .friend-reveal h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .friend-reveal .friend-info {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .friend-reveal .event-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 1.1em;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .delete-btn i {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -475,9 +631,10 @@
         <div class="header">
             <h1>Meus Amigos Ocultos</h1>
             <div class="user-info">
-                <div class="user-name" id="userName">Carregando...</div>
-                <div class="user-email" id="userEmail"></div>
-                <button class="logout-btn" onclick="logout()">Sair</button>
+                <span id="userName"></span>
+                <span id="userEmail"></span>
+                <button onclick="clearAllData()" class="danger-btn">Limpar Dados</button>
+                <button onclick="logout()" class="logout-btn">Sair</button>
             </div>
         </div>
         <div class="dashboard-content">
@@ -565,29 +722,135 @@
         </div>
     </div>
 
+    <!-- Adicione este modal após os outros modais existentes -->
+    <div id="inviteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeInviteModal()">&times;</span>
+            <h2>Convidar Participantes</h2>
+            <div class="friends-selection" id="inviteFriendsSelection">
+                <!-- Lista de amigos será carregada aqui -->
+            </div>
+            <button onclick="sendInvites()" class="invite-btn">Enviar Convites</button>
+        </div>
+    </div>
+
+    <!-- Modal para detalhes do evento -->
+    <div id="eventDetailsModal" class="modal event-details-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEventDetailsModal()">&times;</span>
+            <h2>Detalhes do Amigo Oculto</h2>
+            <div id="eventDetailsContent">
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para amigo sorteado -->
+    <div id="drawnFriendModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDrawnFriendModal()">&times;</span>
+            <div class="friend-reveal">
+                <h3>🎁 Seu Amigo Secreto 🎁</h3>
+                <div id="drawnFriendContent">
+                    <!-- Conteúdo será preenchido dinamicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'http://localhost:3001/api';
 
-        // Carrega os dados do usuário ao iniciar
-        function loadUserData() {
-            const userData = JSON.parse(localStorage.getItem('userData'));
-            if (userData) {
-                document.getElementById('userName').textContent = `Olá, ${userData.name}!`;
-                document.getElementById('userEmail').textContent = userData.email;
-            } else {
-                window.location.href = '/'; // Redireciona para login se não houver dados
+        // Adicione tratamento de erro global
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Erro não tratado:', event.reason);
+            alert('Ocorreu um erro inesperado. Por favor, tente novamente.');
+        });
+
+        // Melhore a verificação de autenticação
+        async function checkAuth() {
+            const token = localStorage.getItem('token');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            
+            if (!token || !userData.id) {
+                console.log('Usuário não autenticado, redirecionando...');
+                window.location.href = '/';
+                return false;
+            }
+            return true;
+        }
+
+        // Adicione verificação de erro nas requisições
+        async function fetchWithAuth(url, options = {}) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        ...options.headers,
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Erro na requisição');
+                }
+
+                return response;
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                throw error;
             }
         }
 
-        async function checkAuth() {
-            const token = localStorage.getItem('token');
-            if (!token) {
+        // Carrega os dados do usuário ao iniciar
+        async function loadUserData() {
+            try {
+                const rawUserData = localStorage.getItem('userData');
+                if (!rawUserData) {
+                    console.error('Dados do usuário não encontrados');
+                    window.location.href = '/';
+                    return;
+                }
+
+                const userData = JSON.parse(rawUserData);
+                console.log('=== DEBUG DADOS DO USUÁRIO ===', {
+                    completo: userData,
+                    id: userData?.id,
+                    email: userData?.email,
+                    nome: userData?.name
+                });
+
+                if (!userData?.id || !userData?.email || !userData?.name) {
+                    console.error('Dados do usuário incompletos:', userData);
+                    window.location.href = '/';
+                    return;
+                }
+
+                document.getElementById('userName').textContent = `Olá, ${userData.name}!`;
+                document.getElementById('userEmail').textContent = userData.email;
+            } catch (error) {
+                console.error('Erro ao carregar dados do usuário:', error);
                 window.location.href = '/';
             }
         }
 
         async function loadEvents() {
             try {
+                // Verifica se o usuário está autenticado e tem dados completos
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                if (!userData?.id || !userData?.email) {
+                    console.error('Dados do usuário incompletos ou ausentes:', userData);
+                    throw new Error('Usuário não autenticado ou dados incompletos');
+                }
+
+                console.log('=== DEBUG DADOS DO USUÁRIO ===', {
+                    id: userData.id,
+                    email: userData.email,
+                    name: userData.name
+                });
+
                 const response = await fetch(`${API_URL}/secret-santa`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -597,26 +860,73 @@
                 if (!response.ok) throw new Error('Erro ao carregar eventos');
 
                 const events = await response.json();
-                const eventsList = document.getElementById('events-list');
+                console.log('Eventos carregados:', events);
 
+                const eventsList = document.getElementById('events-list');
                 if (!events || events.length === 0) {
-                    eventsList.innerHTML = '<p>Nenhum amigo oculto criado ainda.</p>';
+                    eventsList.innerHTML = '<p>Nenhum evento encontrado.</p>';
                     return;
                 }
 
-                eventsList.innerHTML = events.map(event => `
-                    <div class="event-item">
-                        <h3>${event.name}</h3>
-                        <p>Data: ${new Date(event.date).toLocaleDateString()}</p>
-                        <p>Valor Máximo: R$ ${Number(event.budget).toFixed(2)}</p>
-                        <p>Organizador: ${event.organizer.name}</p>
-                        <p>Participantes: ${event.participants ? event.participants.length : 0}</p>
-                    </div>
-                `).join('');
+                eventsList.innerHTML = events.map(event => {
+                    const isDrawn = event.participants.some(p => p.targetUserId !== null);
+                    const isOrganizer = event.organizerId === userData.id;
+
+                    console.log(`=== DEBUG EVENTO ${event.name} ===`, {
+                        evento: {
+                            id: event.id,
+                            organizadorId: event.organizerId
+                        },
+                        usuario: {
+                            id: userData.id,
+                            email: userData.email
+                        },
+                        verificacao: {
+                            isOrganizer,
+                            isDrawn,
+                            participantes: event.participants.length
+                        }
+                    });
+
+                    const hasEnoughParticipants = event.participants.length >= 3;
+
+                    return `
+                        <div class="event-item">
+                            <div class="event-header">
+                                <h3>${event.name}</h3>
+                                ${isOrganizer ? `
+                                    <button onclick="deleteEvent('${event.id}')" class="delete-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                            <p>Data: ${new Date(event.date).toLocaleDateString()}</p>
+                            <p>Valor Máximo: R$ ${Number(event.budget).toFixed(2)}</p>
+                            <p>Participantes: ${event.participants.length}</p>
+                            <div class="event-actions">
+                                ${!hasEnoughParticipants ? `
+                                    <p class="warning-text">É necessário pelo menos 3 participantes</p>
+                                    <button onclick="showInviteModal('${event.id}')" class="invite-btn">
+                                        Convidar Participantes
+                                    </button>
+                                ` : isDrawn ? `
+                                    <button onclick="showEventDetails('${event.id}')" class="details-btn">
+                                        Ver Amigo Sorteado
+                                    </button>
+                                ` : isOrganizer ? `
+                                    <button onclick="performDraw('${event.id}')" class="draw-btn">
+                                        Realizar Sorteio
+                                    </button>
+                                ` : `
+                                    <p class="warning-text">Aguardando o administrador realizar o sorteio</p>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             } catch (error) {
                 console.error('Erro ao carregar eventos:', error);
-                document.getElementById('events-list').innerHTML = 
-                    '<p>Erro ao carregar eventos. Tente novamente mais tarde.</p>';
+                document.getElementById('events-list').innerHTML = '<p>Erro ao carregar eventos.</p>';
             }
         }
 
@@ -709,19 +1019,46 @@
                 if (!response.ok) throw new Error('Erro ao carregar eventos');
 
                 const events = await response.json();
-                const eventsList = document.getElementById('events-list');
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                console.log('Email do usuário atual:', userData?.email);
+                console.log('Eventos:', events);
 
-                if (events.length === 0) {
-                    eventsList.innerHTML = '<p>Nenhum amigo oculto criado ainda.</p>';
-                    return;
-                }
+                const eventsList = document.getElementById('events-list');
 
                 eventsList.innerHTML = events.map(event => `
                     <div class="event-item">
-                        <h3>${event.name}</h3>
+                        <div class="event-header">
+                            <h3>${event.name}</h3>
+                            ${event.organizerId === userData.id ? `
+                                <button onclick="deleteEvent('${event.id}')" class="delete-btn" title="Excluir evento">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
                         <p>Data: ${new Date(event.date).toLocaleDateString()}</p>
-                        <p>Valor Máximo: R$ ${event.budget}</p>
+                        <p>Valor Máximo: R$ ${Number(event.budget).toFixed(2)}</p>
                         <p>Participantes: ${event.participants.length}</p>
+                        <div class="event-actions">
+                            <button onclick="showEventDetailsModal('${event.id}')" class="details-btn">
+                                Ver Detalhes
+                            </button>
+                            ${event.participants.length < 3 ? `
+                                <p class="warning-text">É necessário pelo menos 3 participantes para realizar o sorteio</p>
+                                <button onclick="showInviteModal('${event.id}')" class="invite-btn">
+                                    Convidar Participantes
+                                </button>
+                            ` : event.participants.some(p => p.targetUserId !== null) ? `
+                                <button onclick="showEventDetails('${event.id}')" class="details-btn">
+                                    Ver Amigo Sorteado
+                                </button>
+                            ` : event.organizerId === userData.id ? `
+                                <button onclick="performDraw('${event.id}')" class="draw-btn">
+                                    Realizar Sorteio
+                                </button>
+                            ` : `
+                                <p class="warning-text">Aguardando o administrador realizar o sorteio</p>
+                            `}
+                        </div>
                     </div>
                 `).join('');
             } catch (error) {
@@ -831,12 +1168,25 @@
         }
 
         // Atualiza a inicialização
-        document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
-            loadUserData();
-            loadFriendRequests();
-            loadFriends();
-            loadEvents();
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                if (!userData || !userData.id || !userData.email || !userData.name) {
+                    throw new Error('Dados do usuário inválidos ou incompletos');
+                }
+
+                console.log('=== DADOS DO USUÁRIO CARREGADOS ===', {
+                    id: userData.id,
+                    email: userData.email,
+                    name: userData.name
+                });
+
+                loadUserData();
+                loadEvents();
+            } catch (error) {
+                console.error('Erro na inicialização:', error);
+                window.location.href = '/';
+            }
         });
 
         // Atualize o intervalo
@@ -845,6 +1195,11 @@
         // Funções para gerenciar amigos
         async function loadFriends() {
             try {
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                if (!userData?.id || !userData?.email) {
+                    throw new Error('Usuário não autenticado ou dados incompletos');
+                }
+
                 const response = await fetch(`${API_URL}/friends`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -867,6 +1222,7 @@
                 `).join('');
             } catch (error) {
                 console.error('Erro:', error);
+                document.getElementById('friends-list').innerHTML = '<p>Erro ao carregar amigos.</p>';
             }
         }
 
@@ -1086,15 +1442,298 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('Erro ao responder ao convite');
+                    const data = await response.json();
+                    throw new Error(data.message || 'Erro ao responder ao convite');
                 }
 
-                loadFriendRequests();
-                loadEvents();
-                alert(`Convite ${accept ? 'aceito' : 'recusado'} com sucesso!`);
+                const data = await response.json();
+                alert(data.message);
+                
+                // Recarrega as notificações e eventos
+                await Promise.all([
+                    loadFriendRequests(),
+                    loadEvents()
+                ]);
             } catch (error) {
                 console.error('Erro:', error);
                 alert(error.message);
+            }
+        }
+
+        // Adicione estas funções
+        async function showEventDetails(eventId) {
+            try {
+                const response = await fetch(`${API_URL}/secret-santa/${eventId}/target`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar detalhes');
+
+                const data = await response.json();
+                const modal = document.getElementById('drawnFriendModal');
+                const content = document.getElementById('drawnFriendContent');
+                
+                content.innerHTML = `
+                    <div class="friend-info">
+                        <p><strong>Você tirou:</strong></p>
+                        <h2>${data.target.name}</h2>
+                        <p><strong>Email:</strong> ${data.target.email}</p>
+                    </div>
+                    <div class="event-info">
+                        <p><strong>Data do Evento:</strong> ${new Date(data.event.date).toLocaleDateString()}</p>
+                        <p><strong>Valor Máximo:</strong> R$ ${Number(data.event.budget).toFixed(2)}</p>
+                    </div>
+                `;
+                
+                modal.style.display = 'block';
+            } catch (error) {
+                console.error('Erro:', error);
+                alert(error.message);
+            }
+        }
+
+        async function performDraw(eventId) {
+            try {
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                if (!userData || !userData.id) {
+                    throw new Error('Usuário não autenticado');
+                }
+
+                console.log('=== DEBUG SORTEIO ===', {
+                    eventId,
+                    userId: userData.id,
+                    token: localStorage.getItem('token')?.substring(0, 10) + '...'
+                });
+
+                if (!confirm('Tem certeza que deseja realizar o sorteio? Esta ação não pode ser desfeita.')) {
+                    return;
+                }
+
+                const response = await fetch(`${API_URL}/secret-santa/${eventId}/draw`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+                console.log('=== RESPOSTA DO SORTEIO ===', data);
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erro ao realizar sorteio');
+                }
+
+                alert('Sorteio realizado com sucesso!');
+                loadEvents();
+            } catch (error) {
+                console.error('Erro ao realizar sorteio:', error);
+                alert(error.message);
+            }
+        }
+
+        let currentEventId = null; // Variável para armazenar o ID do evento atual
+
+        async function showInviteModal(eventId) {
+            currentEventId = eventId;
+            const modal = document.getElementById('inviteModal');
+            modal.style.display = 'block';
+            await loadFriendsForInvite(eventId);
+        }
+
+        function closeInviteModal() {
+            const modal = document.getElementById('inviteModal');
+            modal.style.display = 'none';
+            currentEventId = null;
+        }
+
+        async function loadFriendsForInvite(eventId) {
+            try {
+                // Busca a lista de amigos
+                const friendsResponse = await fetch(`${API_URL}/friends`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                // Busca os participantes atuais do evento
+                const eventResponse = await fetch(`${API_URL}/secret-santa/${eventId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!friendsResponse.ok || !eventResponse.ok) {
+                    throw new Error('Erro ao carregar dados');
+                }
+
+                const friends = await friendsResponse.json();
+                const event = await eventResponse.json();
+
+                // Filtra amigos que já são participantes
+                const participantIds = event.participants.map(p => p.userId);
+                const availableFriends = friends.filter(friend => !participantIds.includes(friend.id));
+
+                const friendsList = document.getElementById('inviteFriendsSelection');
+                
+                if (availableFriends.length === 0) {
+                    friendsList.innerHTML = '<p class="no-friends-message">Todos os seus amigos já foram convidados para este evento.</p>';
+                    return;
+                }
+
+                friendsList.innerHTML = availableFriends.map(friend => `
+                    <div class="friend-select-item">
+                        <label for="invite_friend_${friend.id}">
+                            <input type="checkbox" id="invite_friend_${friend.id}" value="${friend.id}">
+                            <span class="friend-info">
+                                <strong>${friend.name}</strong>
+                                <div class="friend-email">${friend.email}</div>
+                            </span>
+                        </label>
+                    </div>
+                `).join('');
+
+                // Adiciona eventos de hover nos itens
+                document.querySelectorAll('.friend-select-item').forEach(item => {
+                    item.addEventListener('mouseover', () => {
+                        item.style.backgroundColor = '#f8f9fa';
+                    });
+                    item.addEventListener('mouseout', () => {
+                        item.style.backgroundColor = '';
+                    });
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar amigos para convite');
+            }
+        }
+
+        async function sendInvites() {
+            try {
+                const selectedFriends = Array.from(document.querySelectorAll('#inviteFriendsSelection input[type="checkbox"]:checked'))
+                    .map(checkbox => checkbox.value);
+
+                if (selectedFriends.length === 0) {
+                    alert('Selecione pelo menos um amigo para convidar');
+                    return;
+                }
+
+                const promises = selectedFriends.map(friendId =>
+                    fetch(`${API_URL}/secret-santa/${currentEventId}/invite`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ invitedUserId: friendId })
+                    })
+                );
+
+                await Promise.all(promises);
+                alert('Convites enviados com sucesso!');
+                closeInviteModal();
+                loadEvents(); // Recarrega a lista de eventos
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao enviar convites');
+            }
+        }
+
+        async function showEventDetailsModal(eventId) {
+            try {
+                const response = await fetch(`${API_URL}/secret-santa/${eventId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar detalhes do evento');
+
+                const event = await response.json();
+                const modal = document.getElementById('eventDetailsModal');
+                const content = document.getElementById('eventDetailsContent');
+
+                content.innerHTML = `
+                    <div class="event-info">
+                        <h3>${event.name}</h3>
+                        <p><strong>Data:</strong> ${new Date(event.date).toLocaleDateString()}</p>
+                        <p><strong>Valor Máximo:</strong> R$ ${Number(event.budget).toFixed(2)}</p>
+                        <p><strong>Organizador:</strong> ${event.organizer.name}</p>
+                        <p><strong>Total de Participantes:</strong> ${event.participants.length}</p>
+                    </div>
+                    <h3>Participantes</h3>
+                    <div class="event-details-grid">
+                        ${event.participants.map(p => `
+                            <div class="participant-card">
+                                <h4>${p.user.name}</h4>
+                                <div class="participant-info">
+                                    <p>${p.user.email}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                modal.style.display = 'block';
+            } catch (error) {
+                console.error('Erro:', error);
+                alert(error.message);
+            }
+        }
+
+        function closeEventDetailsModal() {
+            const modal = document.getElementById('eventDetailsModal');
+            modal.style.display = 'none';
+        }
+
+        function closeDrawnFriendModal() {
+            const modal = document.getElementById('drawnFriendModal');
+            modal.style.display = 'none';
+        }
+
+        async function deleteEvent(eventId) {
+            try {
+                if (!confirm('Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.')) {
+                    return;
+                }
+
+                const response = await fetch(`${API_URL}/secret-santa/${eventId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Erro ao excluir evento');
+                }
+
+                alert('Evento excluído com sucesso!');
+                loadEvents(); // Recarrega a lista de eventos
+            } catch (error) {
+                console.error('Erro ao excluir evento:', error);
+                alert(error.message);
+            }
+        }
+
+        // Adiciona verificação inicial
+        document.addEventListener('DOMContentLoaded', () => {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (!userData || !userData.id) {
+                console.error('Dados do usuário inválidos');
+                window.location.href = '/';
+                return;
+            }
+            loadUserData();
+            loadEvents();
+        });
+
+        function clearAllData() {
+            if (confirm('Tem certeza que deseja limpar todos os dados? Você precisará fazer login novamente.')) {
+                localStorage.clear();
+                window.location.href = '/';
             }
         }
     </script>

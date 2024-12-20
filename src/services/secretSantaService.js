@@ -150,38 +150,100 @@ class SecretSantaService {
         return event;
     }
 
-    async performDraw(secretSantaId, organizerId) {
-        const secretSanta = await prisma.secretSanta.findUnique({
-            where: { id: secretSantaId },
-            include: {
-                participants: true
-            }
-        });
-
-        if (!secretSanta) {
-            throw new CustomError('Amigo oculto não encontrado', 404);
-        }
-
-        if (secretSanta.organizerId !== organizerId) {
-            throw new CustomError('Não autorizado', 403);
-        }
-
-        const participants = secretSanta.participants;
-        if (participants.length < 3) {
-            throw new CustomError('Número insuficiente de participantes', 400);
-        }
-
-        const shuffled = [...participants].sort(() => Math.random() - 0.5);
-        
-        const updates = shuffled.map((participant, index) => {
-            const nextIndex = (index + 1) % shuffled.length;
-            return prisma.participant.update({
-                where: { id: participant.id },
-                data: { targetUserId: shuffled[nextIndex].userId }
+    async performDraw(secretSantaId, userId) {
+        try {
+            const event = await prisma.secretSanta.findUnique({
+                where: { id: secretSantaId },
+                include: {
+                    participants: true
+                }
             });
-        });
 
-        await prisma.$transaction(updates);
+            if (!event) {
+                throw new CustomError('Evento não encontrado', 404);
+            }
+
+            console.log('\n=== VERIFICAÇÃO DE PERMISSÃO DETALHADA ===');
+            console.log({
+                evento: {
+                    id: event.id,
+                    nome: event.name,
+                    organizadorId: event.organizerId
+                },
+                usuario: {
+                    id: userId,
+                    tipo: typeof userId
+                },
+                comparacao: {
+                    organizadorIdTipo: typeof event.organizerId,
+                    usuarioIdTipo: typeof userId,
+                    saoIguais: event.organizerId === userId,
+                    organizadorString: String(event.organizerId),
+                    usuarioString: String(userId),
+                    saoIguaisString: String(event.organizerId) === String(userId)
+                }
+            });
+
+            if (String(event.organizerId) !== String(userId)) {
+                throw new CustomError('Apenas o organizador pode realizar o sorteio', 403);
+            }
+
+            if (event.participants.some(p => p.targetUserId !== null)) {
+                throw new CustomError('Sorteio já foi realizado', 400);
+            }
+
+            if (event.participants.length < 3) {
+                throw new CustomError('É necessário pelo menos 3 participantes', 400);
+            }
+
+            // 2. Realiza o sorteio
+            const participants = event.participants.map(p => p.userId);
+            let targets = [...participants];
+
+            // Embaralha os alvos
+            for (let i = targets.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [targets[i], targets[j]] = [targets[j], targets[i]];
+            }
+
+            // Verifica se alguém tirou a si mesmo
+            let hasSelfDraw;
+            do {
+                hasSelfDraw = false;
+                for (let i = 0; i < participants.length; i++) {
+                    if (participants[i] === targets[i]) {
+                        hasSelfDraw = true;
+                        const nextIndex = (i + 1) % participants.length;
+                        [targets[i], targets[nextIndex]] = [targets[nextIndex], targets[i]];
+                    }
+                }
+            } while (hasSelfDraw);
+
+            // Log do resultado do sorteio
+            console.log('\n=== RESULTADO DO SORTEIO ===');
+            participants.forEach((p, i) => {
+                console.log(`${p} -> ${targets[i]}`);
+            });
+
+            // 3. Salva o resultado
+            await Promise.all(participants.map((userId, index) => 
+                prisma.participant.updateMany({
+                    where: {
+                        secretSantaId,
+                        userId
+                    },
+                    data: {
+                        targetUserId: targets[index]
+                    }
+                })
+            ));
+
+            return { message: 'Sorteio realizado com sucesso' };
+        } catch (error) {
+            console.error('Erro ao realizar sorteio:', error);
+            if (error instanceof CustomError) throw error;
+            throw new CustomError('Erro ao realizar sorteio', 500);
+        }
     }
 
     async inviteParticipant(secretSantaId, userId, invitedUserId) {
@@ -226,6 +288,144 @@ class SecretSantaService {
             console.error('Erro ao enviar convite:', error);
             if (error instanceof CustomError) throw error;
             throw new CustomError('Erro ao enviar convite', 500);
+        }
+    }
+
+    async join(secretSantaId, userId) {
+        try {
+            // Verifica se o evento existe
+            const secretSanta = await prisma.secretSanta.findUnique({
+                where: { id: secretSantaId },
+                include: {
+                    participants: true
+                }
+            });
+
+            if (!secretSanta) {
+                throw new CustomError('Amigo oculto não encontrado', 404);
+            }
+
+            // Verifica se o usuário já é participante
+            const isParticipant = secretSanta.participants.some(p => p.userId === userId);
+            if (isParticipant) {
+                throw new CustomError('Você já é participante deste amigo oculto', 400);
+            }
+
+            // Adiciona o usuário como participante
+            await prisma.participant.create({
+                data: {
+                    secretSantaId,
+                    userId
+                }
+            });
+
+            // Marca a notificação como lida
+            await prisma.notification.updateMany({
+                where: {
+                    secretSantaId,
+                    receiverId: userId,
+                    type: 'EVENT_INVITE'
+                },
+                data: {
+                    read: true
+                }
+            });
+
+            return { message: 'Você foi adicionado ao amigo oculto com sucesso!' };
+        } catch (error) {
+            console.error('Erro ao entrar no amigo oculto:', error);
+            if (error instanceof CustomError) throw error;
+            throw new CustomError('Erro ao entrar no amigo oculto', 500);
+        }
+    }
+
+    async getTarget(secretSantaId, userId) {
+        try {
+            console.log('Buscando alvo para:', { secretSantaId, userId });
+            const participant = await prisma.participant.findFirst({
+                where: {
+                    secretSantaId,
+                    userId,
+                    NOT: {
+                        targetUserId: null
+                    }
+                },
+                include: {
+                    secretSanta: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            email: true
+                        }
+                    }
+                }
+            });
+
+            console.log('Participante encontrado:', participant);
+
+            if (!participant) {
+                throw new CustomError('Participante não encontrado ou sorteio não realizado', 404);
+            }
+
+            // Busca o usuário alvo em uma consulta separada
+            const targetUser = await prisma.user.findUnique({
+                where: {
+                    id: participant.targetUserId
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true
+                }
+            });
+
+            if (!targetUser) {
+                throw new CustomError('Usuário alvo não encontrado', 404);
+            }
+
+            return {
+                target: targetUser,
+                event: participant.secretSanta
+            };
+        } catch (error) {
+            console.error('Erro ao buscar amigo secreto:', error);
+            if (error instanceof CustomError) throw error;
+            throw new CustomError('Erro ao buscar amigo secreto', 500);
+        }
+    }
+
+    async delete(secretSantaId, userId) {
+        try {
+            // Verifica se o evento existe
+            const event = await prisma.secretSanta.findUnique({
+                where: { id: secretSantaId }
+            });
+
+            if (!event) {
+                throw new CustomError('Evento não encontrado', 404);
+            }
+
+            // Verifica se o usuário é o organizador
+            if (event.organizerId !== userId) {
+                throw new CustomError('Apenas o organizador pode excluir o evento', 403);
+            }
+
+            // Exclui os participantes primeiro
+            await prisma.participant.deleteMany({
+                where: { secretSantaId }
+            });
+
+            // Exclui o evento
+            await prisma.secretSanta.delete({
+                where: { id: secretSantaId }
+            });
+
+            return { message: 'Evento excluído com sucesso' };
+        } catch (error) {
+            console.error('Erro ao excluir evento:', error);
+            if (error instanceof CustomError) throw error;
+            throw new CustomError('Erro ao excluir evento', 500);
         }
     }
 }

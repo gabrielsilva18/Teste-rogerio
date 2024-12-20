@@ -14,6 +14,13 @@ class AuthService {
      * @returns {Object} Tokens de acesso e refresh
      */
     generateTokens(userId) {
+        if (!process.env.JWT_SECRET) {
+            throw new CustomError('JWT_SECRET não configurado', 500);
+        }
+        if (!process.env.JWT_REFRESH_SECRET) {
+            throw new CustomError('JWT_REFRESH_SECRET não configurado', 500);
+        }
+
         const token = jwt.sign(
             { id: userId },
             process.env.JWT_SECRET,
@@ -35,43 +42,45 @@ class AuthService {
      * @returns {Object} Usuário criado e tokens
      */
     async register(userData) {
-        // Validação básica dos dados
-        if (!userData.email || !userData.password || !userData.name) {
-            throw new CustomError('Dados incompletos', 400);
-        }
-
-        // Validação de senha
-        if (userData.password.length < 6) {
-            throw new CustomError('A senha deve ter no mínimo 6 caracteres', 400);
-        }
-
         try {
-            const hashedPassword = await bcrypt.hash(userData.password, 8);
-            
-            const user = await prisma.user.create({
-                data: {
-                    name: userData.name,
-                    email: userData.email.toLowerCase(),
-                    password: hashedPassword
-                },
-                select: {
-                    id: true,
-                    name: true,
-                    email: true
+            // Primeiro verifica se já existe um usuário com este email
+            const existingUser = await prisma.user.findUnique({
+                where: {
+                    email: userData.email
                 }
             });
 
+            if (existingUser) {
+                throw new CustomError('Email já cadastrado', 400);
+            }
+
+            const hashedPassword = await bcrypt.hash(userData.password, 8);
+
+            const user = await prisma.user.create({
+                data: {
+                    name: userData.name,
+                    email: userData.email,
+                    password: hashedPassword
+                }
+            });
+
+            // Remove a senha do objeto retornado
+            const { password, ...userWithoutPassword } = user;
+
+            // Gera os tokens usando o método generateTokens
             const tokens = this.generateTokens(user.id);
 
             return {
-                user,
+                user: userWithoutPassword,
                 ...tokens
             };
         } catch (error) {
-            if (error.code === 'P2002') {
+            console.error('Erro no registro:', error);
+            if (error instanceof CustomError) throw error;
+            if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
                 throw new CustomError('Email já cadastrado', 400);
             }
-            throw new CustomError('Erro ao criar usuário', 500);
+            throw new CustomError('Erro ao registrar usuário', 500);
         }
     }
 

@@ -18,7 +18,7 @@ class SecretSantaController {
                 date: new Date(date),
                 budget: parseFloat(budget),
                 organizerId: req.userId,
-                invitedFriends: invitedFriends || [] // Garante que sempre será um array
+                invitedFriends: invitedFriends || []
             });
             
             res.status(201).json(secretSanta);
@@ -29,8 +29,8 @@ class SecretSantaController {
 
     async draw(req, res, next) {
         try {
-            const { secretSantaId } = req.params;
-            await secretSantaService.performDraw(secretSantaId, req.userId);
+            const { id } = req.params;
+            await secretSantaService.performDraw(id, req.userId);
             res.status(200).json({ message: 'Sorteio realizado com sucesso' });
         } catch (error) {
             next(error);
@@ -57,8 +57,26 @@ class SecretSantaController {
 
     async join(req, res, next) {
         try {
-            await secretSantaService.addParticipant(req.params.id, req.userId);
-            res.json({ message: 'Participação confirmada com sucesso' });
+            const { id } = req.params;
+            const { accept } = req.body;
+
+            if (!accept) {
+                // Se recusou, apenas marca a notificação como lida
+                await prisma.notification.updateMany({
+                    where: {
+                        secretSantaId: id,
+                        receiverId: req.userId,
+                        type: 'EVENT_INVITE'
+                    },
+                    data: {
+                        read: true
+                    }
+                });
+                return res.json({ message: 'Convite recusado com sucesso' });
+            }
+
+            const result = await secretSantaService.join(id, req.userId);
+            res.json(result);
         } catch (error) {
             next(error);
         }
@@ -94,6 +112,16 @@ class SecretSantaController {
             );
             
             res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async delete(req, res, next) {
+        try {
+            const { id } = req.params;
+            await secretSantaService.delete(id, req.userId);
+            res.status(200).json({ message: 'Evento excluído com sucesso' });
         } catch (error) {
             next(error);
         }

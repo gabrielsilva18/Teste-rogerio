@@ -16,6 +16,7 @@ model User {
   updatedAt     DateTime      @updatedAt
   organizedEvents SecretSanta[] @relation("Organizer")
   participations Participant[]
+  targetFor     Participant[] @relation("ParticipantTarget")
   sentFriendRequests     Friendship[] @relation("Sender")
   receivedFriendRequests Friendship[] @relation("Receiver")
   sentNotifications      Notification[] @relation("NotificationSender")
@@ -43,6 +44,7 @@ model Participant {
   wishList      String?
   secretSanta   SecretSanta @relation(fields: [secretSantaId], references: [id])
   user          User        @relation(fields: [userId], references: [id])
+  targetUser    User?       @relation("ParticipantTarget", fields: [targetUserId], references: [id])
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 }
